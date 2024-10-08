@@ -7,7 +7,4 @@ build:
 templ:
 	@templ generates
 
-git:
-	@git add .
-	@git commit -m "update"
-	@git push
+git

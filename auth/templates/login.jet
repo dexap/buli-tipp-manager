@@ -1,0 +1,11 @@
+{{ extends "templates/layouts/main.jet" }}
+{{ block content() }}
+<h1>Login</h1>
+<form method="POST" action="/auth/login">
+    <label>Email:</label>
+    <input type="email" name="email" required />
+    <label>Passwort:</label>
+    <input type="password" name="password" required />
+    <button type="submit">Login</button>
+</form>
+{{ end }}

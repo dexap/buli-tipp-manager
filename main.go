@@ -1,63 +1,64 @@
 package main
 
 import (
-	"html/template"
-	"io"
+	"net/http"
 
-	"github.com/dexap/buli-tipp-manager/handlers"
+	"github.com/CloudyKit/jet/v6"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+
+	"github.com/username/buli-tipp-manager/auth"
+	"github.com/username/buli-tipp-manager/home"
+	// Importiere weitere Domänenpakete wie matches, odds
 )
 
 func main() {
 	e := echo.New()
+
+	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	tmpl := template.New("templates")
-	// Template-Renderer einrichten
-	tmpl, err := tmpl.ParseFiles(
-		"templates/base.html")
-
-	if err != nil {
-		e.Logger.Fatal(err)
-	}
-
-	_, err = tmpl.ParseGlob("templates/*.html")
-	if err != nil {
-		e.Logger.Fatal(err)
-	}
-
-	e.Renderer = &TemplateRenderer{
-		templates: tmpl,
-	}
-
-	// Route für die Startseite
-	e.GET("/", handlers.IndexHandler)
-	e.GET("/games", handlers.GamesHandler)
-	e.GET("/auth", handlers.AuthHandler)
-	e.POST("/auth", handlers.AuthHandler)
-
-	// Statische Dateien bereitstellen
+	// Static files
 	e.Static("/static", "static")
 
-	// Server starten
+	// Jet Template Engine
+	views := jet.NewSet(
+		jet.NewOSFileSystemLoader("./"),
+		jet.InDevelopmentMode(), // Entferne dies in der Produktion
+	)
+
+	// Renderer
+	e.Renderer = &JetRenderer{
+		views: views,
+	}
+
+	// Routes
+	home.RegisterRoutes(e)
+	auth.RegisterRoutes(e)
+	// Registriere weitere Routen
+
+	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
 }
 
-// TemplateRenderer is a custom html/template renderer for Echo framework
-type TemplateRenderer struct {
-	templates *template.Template
+type JetRenderer struct {
+	views *jet.Set
 }
 
-// Render renders a template document
-func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	// Überprüfen, ob es eine htmx-Anfrage ist
-	if d, ok := data.(map[string]interface{}); ok {
-		if isHTMX, ok := d["IsHTMX"].(bool); ok && isHTMX && name != "content" {
-			// htmx-Anfrage: nur den Content rendern
-			return t.templates.ExecuteTemplate(w, "content", data)
-		}
+func (r *JetRenderer) Render(w http.ResponseWriter, name string, data interface{}, c echo.Context) error {
+	tmpl, err := r.views.GetTemplate(name)
+	if err != nil {
+		return err
 	}
-	return t.templates.ExecuteTemplate(w, name, data)
+
+	var vars jet.VarMap
+	if data != nil {
+		vars = make(jet.VarMap)
+		vars.Set("data", data)
+	} else {
+		vars = make(jet.VarMap)
+	}
+
+	return tmpl.Execute(w, vars, nil)
 }

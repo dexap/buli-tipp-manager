@@ -1,0 +1,5 @@
+{{ extends "templates/layouts/main.jet" }}
+{{ block content() }}
+<h1>Willkommen zur Bundesliga Tipp App</h1>
+<p>Hier kannst du auf die kommenden Spiele wetten!</p>
+{{ end }}
