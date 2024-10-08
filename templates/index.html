@@ -1,15 +1,5 @@
-<!DOCTYPE html>
-<html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Fussball Wetten App</title>
-    <link href="/static/styles.css" rel="stylesheet" />
-    <script src="https://unpkg.com/htmx.org@1.8.4"></script>
-  </head>
-  <body>
-    <h1 class="text-3xl font-bold underline">
-      Willkommen zur Fussball Wetten App! 2
-    </h1>
-    <!-- Weitere Inhalte -->
-  </body>
-</html>
+{{define "content"}}
+<h1 class="text-3xl font-bold">content of index.html</h1>
+<!-- Weitere Inhalte -->
+{{end}} {{define "index"}} {{if .IsHTMX}} {{template "content" .}} {{else}}
+{{template "base" .}} {{end}} {{end}}

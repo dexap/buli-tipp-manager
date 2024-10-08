@@ -1,0 +1,35 @@
+{{define "base"}}
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{.Title}}</title>
+    <link href="/static/output.css" rel="stylesheet" />
+    <script src="https://unpkg.com/htmx.org@1.8.4"></script>
+  </head>
+  <body hx-boost="true" hx-target="#content">
+    <header class="navbar bg-base-100">
+      <div class="flex-1">
+        <a href="/" class="btn btn-ghost normal-case text-xl"
+          >Fußball Wetten App</a
+        >
+      </div>
+      <div class="flex-none">
+        <ul class="menu menu-horizontal px-1">
+          <li>
+            <a href="/">Startseite</a>
+          </li>
+          <li>
+            <a href="/games">Spiele</a>
+          </li>
+          <li>
+            <a href="/auth">Anmelden/Registrieren</a>
+          </li>
+        </ul>
+      </div>
+    </header>
+
+    <main id="content">{{block "content" .}}{{end}}</main>
+  </body>
+</html>
+{{end}}
